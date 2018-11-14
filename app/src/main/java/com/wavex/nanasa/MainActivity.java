@@ -4,8 +4,13 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.facebook.AccessToken;
@@ -29,6 +34,11 @@ import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
 
+    Toolbar toolbar;
+    EditText email,password,name;
+    CheckBox checkBox;
+    ImageButton signup;
+    Button signin;
     LoginButton loginButton;
     CallbackManager callbackManager;
     private static final String EMAIL = "email";
@@ -47,8 +57,52 @@ public class MainActivity extends AppCompatActivity {
         callbackManager = CallbackManager.Factory.create();
         loginButton.setReadPermissions(Arrays.asList(EMAIL));
 
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
+        email = (EditText)findViewById(R.id.email);
+        password = (EditText)findViewById(R.id.password);
+        name = (EditText)findViewById(R.id.name);
+        checkBox = (CheckBox)findViewById(R.id.checkbox);
+        signup =(ImageButton)findViewById(R.id.signup);
+
+
+        signup.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(MainActivity.this,"Sign Up Button Clicked",Toast.LENGTH_LONG).show();
+                startSignIn();
+            }
+        });
+
     }
 
+    private void startSignIn() {
+        String NewEmail = email.getText().toString();
+        String NewPassword = password.getText().toString();
+
+        mAuth.createUserWithEmailAndPassword(NewEmail,NewPassword)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            //FirebaseUser user = mAuth.getCurrentUser();
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Toast.makeText(MainActivity.this, "Authentication failed.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+    });
+    }
+
+    public void onStart() {
+        super.onStart();
+        // Check if user is signed in (non-null) and update UI accordingly.
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+    }
+
+
+    //Facebook Auth
     public void ButtonClickLoginFb(View v){
 
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
